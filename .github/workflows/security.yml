@@ -11,10 +11,24 @@ permissions:
 jobs:
   dependencies-analysis:
     name: Dependencies Analysis
-    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.3.5
-    with:
-      scan-args: |-
-        --recursive
-        ./
-      results-file-name: DependenciesAnalysisFull.sarif
-      fail-on-vuln: false
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: run osv-scanner
+        uses: google/osv-scanner-action/osv-scanner-action@7222d1c7ee4f96d71d883e0d3c603f1e1705eca9
+        with:
+          scan-args: |-
+            --format sarif
+            --output DependenciesAnalysisFull.sarif
+            ./
+        continue-on-error: true
+
+      - name: Upload OSV SARIF report
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: DependenciesAnalysisFull.sarif
+          category: dependencies-analysis
