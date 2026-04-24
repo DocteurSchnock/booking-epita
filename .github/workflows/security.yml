@@ -9,10 +9,12 @@ permissions:
   security-events: write
 
 jobs:
-  test:
-    name: Test security pipeline
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Pipeline ready
-        run: echo "Security pipeline is ready"
+  dependencies-analysis:
+    name: Dependencies Analysis
+    uses: google/osv-scanner-action/.github/workflows/osv-scanner-reusable.yml@v2.3.5
+    with:
+      scan-args: |-
+        --recursive
+        ./
+      results-file-name: DependenciesAnalysisFull.sarif
+      fail-on-vuln: false
