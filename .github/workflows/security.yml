@@ -32,3 +32,30 @@ jobs:
         with:
           sarif_file: DependenciesAnalysisFull.sarif
           category: dependencies-analysis
+
+  source-code-analysis:
+    name: Source Code Analysis
+    runs-on: ubuntu-latest
+
+    container:
+      image: returntocorp/semgrep:latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Run Semgrep analysis
+        run: |
+          semgrep scan \
+            --config .semgrep \
+            --sarif \
+            --output SourceCodeAnalysisFull.sarif \
+            .
+        continue-on-error: true
+
+      - name: Upload Semgrep SARIF report
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: SourceCodeAnalysisFull.sarif
+          category: source-code-analysis
